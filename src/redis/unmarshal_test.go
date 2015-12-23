@@ -27,7 +27,19 @@ func Unmarshal(buffer *bytes.Buffer, index int) (result Any, error error) {
 		}
 		return i, nil
 	case '$':
-		return nil, nil
+		lengthString, error := readLine(buffer)
+		if error != nil {
+			log.Fatal(error)
+			return nil, error
+		}
+		length, error := strconv.Atoi(lengthString)
+		if error != nil {
+			log.Fatal(error)
+			return nil, error
+		}
+		bytes := buffer.Next(length)
+		s := string(bytes)
+		return s, nil
 	default:
 		log.Fatalf("Unknown Redis type %s", string(r))
 		return nil, fmt.Errorf("Unknown Redis type")
