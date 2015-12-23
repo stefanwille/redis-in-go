@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func Unmarshal(buffer *bytes.Buffer, index int) (result Any, error error) {
+func Unmarshal(buffer *bytes.Buffer) (result Any, error error) {
 	r, _, error := buffer.ReadRune()
 	if error != nil {
 		log.Fatal(error)
@@ -39,6 +39,7 @@ func Unmarshal(buffer *bytes.Buffer, index int) (result Any, error error) {
 		}
 		bytes := buffer.Next(length)
 		s := string(bytes)
+		_ = buffer.Next(2)
 		return s, nil
 	case '+':
 		s, error := readLine(buffer)
@@ -47,9 +48,30 @@ func Unmarshal(buffer *bytes.Buffer, index int) (result Any, error error) {
 			return nil, error
 		}
 		return s, nil
+	case '*':
+		lengthString, error := readLine(buffer)
+		if error != nil {
+			log.Fatal(error)
+			return nil, error
+		}
+		length, error := strconv.Atoi(lengthString)
+		if error != nil {
+			log.Fatal(error)
+			return nil, error
+		}
+		var array []Any
+		for i := 0; i < length; i++ {
+			element, error := Unmarshal(buffer)
+			if error != nil {
+				log.Fatal(error)
+				return nil, error
+			}
+			array = append(array, element)
+		}
+		return array, nil
 	default:
-		log.Fatalf("Unknown Redis type %s", string(r))
-		return nil, fmt.Errorf("Unknown Redis type")
+		log.Fatalf("Unknown Redis type '%s'", string(r))
+		return nil, fmt.Errorf("Unknown Redis type |'%s'|", string(r))
 	}
 }
 
@@ -85,7 +107,7 @@ func readLine(buffer *bytes.Buffer) (line string, error error) {
 func TestUnmarshalInt(t *testing.T) {
 	var buffer *bytes.Buffer = bytes.NewBufferString(":1000\r\n")
 	var result Any
-	result, error := Unmarshal(buffer, 0)
+	result, error := Unmarshal(buffer)
 	if error != nil {
 		t.Error(error)
 	}
@@ -97,7 +119,7 @@ func TestUnmarshalInt(t *testing.T) {
 func TestUnmarshalString(t *testing.T) {
 	var buffer *bytes.Buffer = bytes.NewBufferString("$6\r\nfoobar\r\n")
 	var result Any
-	result, error := Unmarshal(buffer, 0)
+	result, error := Unmarshal(buffer)
 	if error != nil {
 		t.Error(error)
 	}
@@ -109,7 +131,7 @@ func TestUnmarshalString(t *testing.T) {
 func TestUnmarshalEmptyString(t *testing.T) {
 	var buffer *bytes.Buffer = bytes.NewBufferString("$0\r\n\r\n")
 	var result Any
-	result, error := Unmarshal(buffer, 0)
+	result, error := Unmarshal(buffer)
 	if error != nil {
 		t.Error(error)
 	}
@@ -121,7 +143,7 @@ func TestUnmarshalEmptyString(t *testing.T) {
 func TestUnmarshalSimpleString(t *testing.T) {
 	var buffer *bytes.Buffer = bytes.NewBufferString("+foobar\r\n")
 	var result Any
-	result, error := Unmarshal(buffer, 0)
+	result, error := Unmarshal(buffer)
 	if error != nil {
 		t.Error(error)
 	}
@@ -129,10 +151,11 @@ func TestUnmarshalSimpleString(t *testing.T) {
 		t.Errorf("Expected foobar, got %v", result)
 	}
 }
+
 func TestUnmarshalArray(t *testing.T) {
 	var buffer *bytes.Buffer = bytes.NewBufferString("*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n")
 	var result Any
-	result, error := Unmarshal(buffer, 0)
+	result, error := Unmarshal(buffer)
 	if error != nil {
 		t.Error(error)
 	}
