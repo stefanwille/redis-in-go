@@ -17,12 +17,15 @@ func Marshal(writer io.Writer, value Any) {
 	case string:
 		var stringValue string = value.(string)
 		fmt.Fprintf(writer, "$%d\r\n%s\r\n", len(stringValue), stringValue)
-	case []Any:
-		var arrayValue []Any = value.([]Any)
-		fmt.Fprintf(writer, "*%d\r\n", len(arrayValue))
-		for _, anyValue := range arrayValue {
+	case *[]Any:
+		var arrayPointerValue *[]Any = value.(*[]Any)
+		fmt.Fprintf(writer, "*%d\r\n", len(*arrayPointerValue))
+		for _, anyValue := range *arrayPointerValue {
 			Marshal(writer, anyValue)
 		}
+	case []Any:
+		var arrayValue []Any = value.([]Any)
+		Marshal(writer, &arrayValue)
 	default:
 		panic(fmt.Sprintf("Unrecognized type '%T' for redis.Marshal", t))
 	}
@@ -67,7 +70,7 @@ func TestMarshalArray(t *testing.T) {
 
 	var a []Any = []Any{"foo", "bar"}
 
-	Marshal(&b, a)
+	Marshal(&b, &a)
 	var result string = b.String()
 	expected := "*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n"
 	if result != expected {
@@ -80,7 +83,7 @@ func TestMarshalEmptyArray(t *testing.T) {
 
 	var a []Any = []Any{}
 
-	Marshal(&b, a)
+	Marshal(&b, &a)
 	var result string = b.String()
 	expected := "*0\r\n"
 	if result != expected {
