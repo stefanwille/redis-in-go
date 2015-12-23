@@ -165,18 +165,18 @@ func TestUnmarshalArray(t *testing.T) {
 	}
 }
 
-// func TestMarshalArray(t *testing.T) {
-// 	var b bytes.Buffer
-
-// 	var a []Any = []Any{"foo", "bar"}
-
-// 	Marshal(&b, &a)
-// 	var result string = b.String()
-// 	expected := "*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n"
-// 	if result != expected {
-// 		t.Errorf("Expected %s, got %s", expected, result)
-// 	}
-// }
+func TestUnmarshalEmptyArray(t *testing.T) {
+	var buffer *bytes.Buffer = bytes.NewBufferString("*0\r\n")
+	var result Any
+	result, error := Unmarshal(buffer)
+	if error != nil {
+		t.Error(error)
+	}
+	array := result.([]Any)
+	if len(array) != 0 {
+		t.Errorf("Expected array of length 0, got %v", array)
+	}
+}
 
 // func TestMarshalEmptyArray(t *testing.T) {
 // 	var b bytes.Buffer
