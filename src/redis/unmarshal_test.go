@@ -75,17 +75,17 @@ func TestUnmarshalInt(t *testing.T) {
 	}
 }
 
-// func TestUnmarshalString(t *testing.T) {
-// 	var buffer *bytes.Buffer = bytes.NewBufferString("$6\r\nfoobar\r\n")
-// 	var result Any
-// 	result, _, error := Unmarshal(buffer, 0)
-// 	if error != nil {
-// 		t.Error(error)
-// 	}
-// 	if result.(string) != "foobar" {
-// 		t.Errorf("Expected foobar, got %v", result)
-// 	}
-// }
+func TestUnmarshalString(t *testing.T) {
+	var buffer *bytes.Buffer = bytes.NewBufferString("$6\r\nfoobar\r\n")
+	var result Any
+	result, error := Unmarshal(buffer, 0)
+	if error != nil {
+		t.Error(error)
+	}
+	if result.(string) != "foobar" {
+		t.Errorf("Expected foobar, got %v", result)
+	}
+}
 
 // func TestMarshalString(t *testing.T) {
 // 	var b bytes.Buffer
