@@ -2,7 +2,7 @@ package redis
 
 import (
 	"bytes"
-	"errors"
+	"fmt"
 	"log"
 	"strconv"
 	"testing"
@@ -17,36 +17,55 @@ func Unmarshal(buffer *bytes.Buffer, index int) (result Any, newIndex int, error
 	newIndex += n
 	switch r {
 	case ':':
-		integerString := ""
-		for {
-			c, n, error := buffer.ReadRune()
-			if error != nil {
-				log.Fatal(error)
-				return nil, newIndex, error
-			}
-			newIndex += n
-
-			if c == '\r' {
-				_, n, error := buffer.ReadRune()
-				if error != nil {
-					log.Fatal(error)
-					return nil, newIndex, error
-				}
-				newIndex += n
-				i, error := strconv.Atoi(integerString)
-				if error != nil {
-					log.Fatal(error)
-					return nil, newIndex, error
-				}
-				return i, newIndex, nil
-			} else {
-				integerString += string(c)
-			}
+		integerString, newIndex, error := readLine(buffer, newIndex)
+		if error != nil {
+			log.Fatal(error)
+			return nil, newIndex, error
 		}
+		i, error := strconv.Atoi(integerString)
+		if error != nil {
+			log.Fatal(error)
+			return nil, newIndex, error
+		}
+		return i, newIndex, nil
+	case '$':
+		return nil, newIndex, nil
 	default:
-		log.Fatal("Unknown Redis type")
-		return nil, newIndex, errors.New("Unknown Redis type")
+		log.Fatalf("Unknown Redis type %s", string(r))
+		return nil, newIndex, fmt.Errorf("Unknown Redis type")
 	}
+}
+
+func readLine(buffer *bytes.Buffer, index int) (line string, newIndex int, error error) {
+	line = ""
+	for {
+		c, n, error := buffer.ReadRune()
+		if error != nil {
+			log.Fatal(error)
+			return line, newIndex, error
+		}
+		newIndex += n
+
+		if c == '\r' {
+			break
+		} else {
+			line += string(c)
+		}
+	}
+
+	// Read newline
+	c, n, error := buffer.ReadRune()
+	if error != nil {
+		log.Fatal(error)
+		return line, newIndex, error
+	}
+	newIndex += n
+	if c != '\n' {
+		log.Fatal("Expected newline")
+		return line, newIndex, fmt.Errorf("Expected newline, got %s", string(c))
+	}
+	newIndex += n
+	return line, newIndex, nil
 }
 
 func TestUnmarshalInt(t *testing.T) {
@@ -60,6 +79,18 @@ func TestUnmarshalInt(t *testing.T) {
 		t.Errorf("Expected 1000, got %v", result)
 	}
 }
+
+// func TestUnmarshalString(t *testing.T) {
+// 	var buffer *bytes.Buffer = bytes.NewBufferString("$6\r\nfoobar\r\n")
+// 	var result Any
+// 	result, _, error := Unmarshal(buffer, 0)
+// 	if error != nil {
+// 		t.Error(error)
+// 	}
+// 	if result.(string) != "foobar" {
+// 		t.Errorf("Expected foobar, got %v", result)
+// 	}
+// }
 
 // func TestMarshalString(t *testing.T) {
 // 	var b bytes.Buffer
