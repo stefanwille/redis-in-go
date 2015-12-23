@@ -28,6 +28,10 @@ func Marshal(writer io.Writer, value Any) {
 	}
 }
 
+func MarshalSimpleString(writer io.Writer, value string) {
+	fmt.Fprintf(writer, "+%s\r\n", value)
+}
+
 func TestMarshalInt(t *testing.T) {
 	var buffer bytes.Buffer
 	var writer io.Writer = &buffer
@@ -80,6 +84,17 @@ func TestMarshalEmptyArray(t *testing.T) {
 	Marshal(&b, a)
 	var result string = b.String()
 	expected := "*0\r\n"
+	if result != expected {
+		t.Errorf("Expected %s, got %s", expected, result)
+	}
+}
+
+func TestMarshalSimpleString(t *testing.T) {
+	var b bytes.Buffer
+
+	MarshalSimpleString(&b, "foobar")
+	var result string = b.String()
+	expected := "+foobar\r\n"
 	if result != expected {
 		t.Errorf("Expected %s, got %s", expected, result)
 	}
