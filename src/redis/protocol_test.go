@@ -34,9 +34,8 @@ func MarshalSimpleString(writer io.Writer, value string) {
 
 func TestMarshalInt(t *testing.T) {
 	var buffer bytes.Buffer
-	var writer io.Writer = &buffer
 
-	Marshal(writer, 1000)
+	Marshal(&buffer, 1000)
 	var result string = buffer.String()
 	if result != ":1000\r\n" {
 		t.Error(result)
