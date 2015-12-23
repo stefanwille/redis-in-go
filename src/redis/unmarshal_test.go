@@ -177,16 +177,3 @@ func TestUnmarshalEmptyArray(t *testing.T) {
 		t.Errorf("Expected array of length 0, got %v", array)
 	}
 }
-
-// func TestMarshalEmptyArray(t *testing.T) {
-// 	var b bytes.Buffer
-
-// 	var a []Any = []Any{}
-
-// 	Marshal(&b, &a)
-// 	var result string = b.String()
-// 	expected := "*0\r\n"
-// 	if result != expected {
-// 		t.Errorf("Expected %s, got %s", expected, result)
-// 	}
-// }
