@@ -99,6 +99,18 @@ func TestUnmarshalString(t *testing.T) {
 	}
 }
 
+func TestEmptyString(t *testing.T) {
+	var buffer *bytes.Buffer = bytes.NewBufferString("$0\r\n\r\n")
+	var result Any
+	result, error := Unmarshal(buffer, 0)
+	if error != nil {
+		t.Error(error)
+	}
+	if result.(string) != "" {
+		t.Errorf("Expected empty string, got %v", result)
+	}
+}
+
 // func TestMarshalString(t *testing.T) {
 // 	var b bytes.Buffer
 
