@@ -8,43 +8,40 @@ import (
 	"testing"
 )
 
-func Unmarshal(buffer *bytes.Buffer, index int) (result Any, newIndex int, error error) {
-	newIndex = index
-	r, n, error := buffer.ReadRune()
+func Unmarshal(buffer *bytes.Buffer, index int) (result Any, error error) {
+	r, _, error := buffer.ReadRune()
 	if error != nil {
 		log.Fatal(error)
 	}
-	newIndex += n
 	switch r {
 	case ':':
-		integerString, newIndex, error := readLine(buffer, newIndex)
+		integerString, error := readLine(buffer)
 		if error != nil {
 			log.Fatal(error)
-			return nil, newIndex, error
+			return nil, error
 		}
 		i, error := strconv.Atoi(integerString)
 		if error != nil {
 			log.Fatal(error)
-			return nil, newIndex, error
+			return nil, error
 		}
-		return i, newIndex, nil
+		return i, nil
 	case '$':
-		return nil, newIndex, nil
+		return nil, nil
 	default:
 		log.Fatalf("Unknown Redis type %s", string(r))
-		return nil, newIndex, fmt.Errorf("Unknown Redis type")
+		return nil, fmt.Errorf("Unknown Redis type")
 	}
 }
 
-func readLine(buffer *bytes.Buffer, index int) (line string, newIndex int, error error) {
+func readLine(buffer *bytes.Buffer) (line string, error error) {
 	line = ""
 	for {
-		c, n, error := buffer.ReadRune()
+		c, _, error := buffer.ReadRune()
 		if error != nil {
 			log.Fatal(error)
-			return line, newIndex, error
+			return line, error
 		}
-		newIndex += n
 
 		if c == '\r' {
 			break
@@ -54,24 +51,22 @@ func readLine(buffer *bytes.Buffer, index int) (line string, newIndex int, error
 	}
 
 	// Read newline
-	c, n, error := buffer.ReadRune()
+	c, _, error := buffer.ReadRune()
 	if error != nil {
 		log.Fatal(error)
-		return line, newIndex, error
+		return line, error
 	}
-	newIndex += n
 	if c != '\n' {
 		log.Fatal("Expected newline")
-		return line, newIndex, fmt.Errorf("Expected newline, got %s", string(c))
+		return line, fmt.Errorf("Expected newline, got %s", string(c))
 	}
-	newIndex += n
-	return line, newIndex, nil
+	return line, nil
 }
 
 func TestUnmarshalInt(t *testing.T) {
 	var buffer *bytes.Buffer = bytes.NewBufferString(":1000\r\n")
 	var result Any
-	result, _, error := Unmarshal(buffer, 0)
+	result, error := Unmarshal(buffer, 0)
 	if error != nil {
 		t.Error(error)
 	}
