@@ -17,16 +17,23 @@ func Marshal(writer io.Writer, value Any) {
 	case string:
 		var stringValue string = value.(string)
 		fmt.Fprintf(writer, "$%d\r\n%s\r\n", len(stringValue), stringValue)
+	case []Any:
+		var arrayValue []Any = value.([]Any)
+		fmt.Fprintf(writer, "*%d\r\n", len(arrayValue))
+		for _, anyValue := range arrayValue {
+			Marshal(writer, anyValue)
+		}
 	default:
 		panic(fmt.Sprintf("Unrecognized type '%T' for redis.Marshal", t))
 	}
 }
 
 func TestMarshalInt(t *testing.T) {
-	var b bytes.Buffer
+	var buffer bytes.Buffer
+	var writer io.Writer = &buffer
 
-	Marshal(&b, 1000)
-	var result string = b.String()
+	Marshal(writer, 1000)
+	var result string = buffer.String()
 	if result != ":1000\r\n" {
 		t.Error(result)
 	}
@@ -49,5 +56,31 @@ func TestMarshalEmptyString(t *testing.T) {
 	var result string = b.String()
 	if result != "$0\r\n\r\n" {
 		t.Error(result)
+	}
+}
+
+func TestMarshalArray(t *testing.T) {
+	var b bytes.Buffer
+
+	var a []Any = []Any{"foo", "bar"}
+
+	Marshal(&b, a)
+	var result string = b.String()
+	expected := "*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n"
+	if result != expected {
+		t.Errorf("Expected %s, got %s", expected, result)
+	}
+}
+
+func TestMarshalEmptyArray(t *testing.T) {
+	var b bytes.Buffer
+
+	var a []Any = []Any{}
+
+	Marshal(&b, a)
+	var result string = b.String()
+	expected := "*0\r\n"
+	if result != expected {
+		t.Errorf("Expected %s, got %s", expected, result)
 	}
 }
