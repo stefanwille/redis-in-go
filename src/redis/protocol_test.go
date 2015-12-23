@@ -41,3 +41,13 @@ func TestMarshalString(t *testing.T) {
 		t.Error(result)
 	}
 }
+
+func TestMarshalEmptyString(t *testing.T) {
+	var b bytes.Buffer
+
+	Marshal(&b, "")
+	var result string = b.String()
+	if result != "$0\r\n\r\n" {
+		t.Error(result)
+	}
+}
