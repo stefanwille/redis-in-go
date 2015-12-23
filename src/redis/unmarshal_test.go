@@ -40,6 +40,13 @@ func Unmarshal(buffer *bytes.Buffer, index int) (result Any, error error) {
 		bytes := buffer.Next(length)
 		s := string(bytes)
 		return s, nil
+	case '+':
+		s, error := readLine(buffer)
+		if error != nil {
+			log.Fatal(error)
+			return nil, error
+		}
+		return s, nil
 	default:
 		log.Fatalf("Unknown Redis type %s", string(r))
 		return nil, fmt.Errorf("Unknown Redis type")
@@ -99,7 +106,7 @@ func TestUnmarshalString(t *testing.T) {
 	}
 }
 
-func TestEmptyString(t *testing.T) {
+func TestUnmarshalEmptyString(t *testing.T) {
 	var buffer *bytes.Buffer = bytes.NewBufferString("$0\r\n\r\n")
 	var result Any
 	result, error := Unmarshal(buffer, 0)
@@ -111,15 +118,17 @@ func TestEmptyString(t *testing.T) {
 	}
 }
 
-// func TestMarshalString(t *testing.T) {
-// 	var b bytes.Buffer
-
-// 	Marshal(&b, "foobar")
-// 	var result string = b.String()
-// 	if result != "$6\r\nfoobar\r\n" {
-// 		t.Error(result)
-// 	}
-// }
+func TestUnmarshalSimpleString(t *testing.T) {
+	var buffer *bytes.Buffer = bytes.NewBufferString("+foobar\r\n")
+	var result Any
+	result, error := Unmarshal(buffer, 0)
+	if error != nil {
+		t.Error(error)
+	}
+	if result.(string) != "foobar" {
+		t.Errorf("Expected foobar, got %v", result)
+	}
+}
 
 // func TestMarshalEmptyString(t *testing.T) {
 // 	var b bytes.Buffer
@@ -152,17 +161,6 @@ func TestEmptyString(t *testing.T) {
 // 	Marshal(&b, &a)
 // 	var result string = b.String()
 // 	expected := "*0\r\n"
-// 	if result != expected {
-// 		t.Errorf("Expected %s, got %s", expected, result)
-// 	}
-// }
-
-// func TestMarshalSimpleString(t *testing.T) {
-// 	var b bytes.Buffer
-
-// 	MarshalSimpleString(&b, "foobar")
-// 	var result string = b.String()
-// 	expected := "+foobar\r\n"
 // 	if result != expected {
 // 		t.Errorf("Expected %s, got %s", expected, result)
 // 	}
