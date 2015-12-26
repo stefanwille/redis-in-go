@@ -1,11 +1,9 @@
-package redis
+package protocol
 
 import (
 	"fmt"
 	"io"
 )
-
-type Any interface{}
 
 func Marshal(writer io.Writer, value Any) {
 	switch t := value.(type) {
