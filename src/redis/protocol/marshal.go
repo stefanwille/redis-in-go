@@ -5,25 +5,35 @@ import (
 	"io"
 )
 
-func Marshal(writer io.Writer, value Any) {
+func Marshal(writer io.Writer, value Any) error {
 	switch t := value.(type) {
 	case int:
 		var intValue int = value.(int)
 		fmt.Fprintf(writer, ":%d\r\n", intValue)
+		return nil
+
 	case string:
 		var stringValue string = value.(string)
 		fmt.Fprintf(writer, "$%d\r\n%s\r\n", len(stringValue), stringValue)
+		return nil
+
 	case *[]Any:
 		var arrayPointerValue *[]Any = value.(*[]Any)
 		fmt.Fprintf(writer, "*%d\r\n", len(*arrayPointerValue))
 		for _, anyValue := range *arrayPointerValue {
-			Marshal(writer, anyValue)
+			error := Marshal(writer, anyValue)
+			if error != nil {
+				return error
+			}
 		}
+		return nil
+
 	case []Any:
 		var arrayValue []Any = value.([]Any)
-		Marshal(writer, &arrayValue)
+		return Marshal(writer, &arrayValue)
+
 	default:
-		panic(fmt.Sprintf("Unrecognized type '%T' for redis.Marshal", t))
+		return fmt.Errorf("Unrecognized type '%T' for redis.protocol.Marshal", t)
 	}
 }
 

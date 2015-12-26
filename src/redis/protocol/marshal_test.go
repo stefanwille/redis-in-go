@@ -71,3 +71,14 @@ func TestMarshalSimpleString(t *testing.T) {
 		t.Errorf("Expected %s, got %s", expected, result)
 	}
 }
+func TestMarshalUnsupportedTypeReturnsAnError(t *testing.T) {
+	var b bytes.Buffer
+
+	var m map[string]string
+	var a []Any = []Any{m}
+
+	error := Marshal(&b, &a)
+	if error == nil {
+		t.Error("Expected error, got nil")
+	}
+}
