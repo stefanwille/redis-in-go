@@ -7,10 +7,12 @@ import (
 
 type Server struct {
 	listenAddress string
+	database      *Database
 }
 
 func New(listenAddress string) *Server {
-	server := Server{listenAddress}
+	database := NewDatabase()
+	server := Server{listenAddress, database}
 	return &server
 }
 
@@ -34,6 +36,6 @@ func (server *Server) Listen() (error error) {
 }
 
 func (server *Server) handleConnection(conn net.Conn) {
-	connection := NewConnection(conn)
+	connection := NewConnection(conn, server.database)
 	connection.ServeRequests()
 }

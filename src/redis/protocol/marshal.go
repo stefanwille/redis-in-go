@@ -7,6 +7,10 @@ import (
 
 func Marshal(writer io.Writer, value Any) error {
 	switch t := value.(type) {
+	case nil:
+		fmt.Fprintf(writer, "$-1\r\n")
+		return nil
+
 	case int:
 		var intValue int = value.(int)
 		fmt.Fprintf(writer, ":%d\r\n", intValue)

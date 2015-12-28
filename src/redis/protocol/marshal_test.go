@@ -51,6 +51,20 @@ func TestMarshalError(t *testing.T) {
 	}
 }
 
+func TestMarshalNil(t *testing.T) {
+	var b bytes.Buffer
+
+	error := Marshal(&b, nil)
+	if error != nil {
+		t.Errorf("Got error: %v", error)
+		return
+	}
+	var result string = b.String()
+	if result != "$-1\r\n" {
+		t.Error(result)
+	}
+}
+
 func TestMarshalArray(t *testing.T) {
 	var b bytes.Buffer
 

@@ -42,6 +42,16 @@ func TestUnmarshalEmptyString(t *testing.T) {
 	}
 }
 
+func TestUnmarshalNil(t *testing.T) {
+	result, error := UnmarshalString("$-1\r\n")
+	if error != nil {
+		t.Error(error)
+	}
+	if result != nil {
+		t.Errorf("Expected nil, got %v", result)
+	}
+}
+
 func TestUnmarshalSimpleString(t *testing.T) {
 	result, error := UnmarshalString("+foobar\r\n")
 	if error != nil {

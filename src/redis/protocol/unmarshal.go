@@ -25,7 +25,9 @@ func Unmarshal(reader *bufio.Reader) (result Any, error error) {
 			return nil, error
 		}
 		return i, nil
+
 	case '$':
+		// Read the string length
 		lengthString, error := readLine(reader)
 		if error != nil {
 			log.Print(error)
@@ -36,18 +38,27 @@ func Unmarshal(reader *bufio.Reader) (result Any, error error) {
 			log.Print(error)
 			return nil, error
 		}
+		if length == -1 {
+			return nil, nil
+		}
+
+		// Read the actual string
 		bytes, error := next(length, reader)
 		if error != nil {
 			log.Print(error)
 			return nil, error
 		}
+		stringResult := string(*bytes)
+
+		// Skip trailing CR/LF
 		_, error = next(2, reader)
 		if error != nil {
 			log.Print(error)
 			return nil, error
 		}
-		s := string(*bytes)
-		return s, nil
+
+		return stringResult, nil
+
 	case '+':
 		s, error := readLine(reader)
 		if error != nil {
@@ -55,6 +66,7 @@ func Unmarshal(reader *bufio.Reader) (result Any, error error) {
 			return nil, error
 		}
 		return s, nil
+
 	case '*':
 		lengthString, error := readLine(reader)
 		if error != nil {
@@ -74,6 +86,7 @@ func Unmarshal(reader *bufio.Reader) (result Any, error error) {
 			array = append(array, element)
 		}
 		return array, nil
+
 	default:
 		log.Fatalf("Unknown Redis type '%s'", string(r))
 		return nil, fmt.Errorf("Unknown Redis type |'%s'|", string(r))
