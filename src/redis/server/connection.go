@@ -105,10 +105,10 @@ func (connection *Connection) sendResponse(response protocol.Any) (error error) 
 	return nil
 }
 
-func (connection *Connection) set(request []protocol.Any) (error error) {
-	return nil
+func (connection *Connection) set(request []protocol.Any) (response protocol.Any) {
+	return "OK"
 }
 
-func (connection *Connection) get(request []protocol.Any) (error error) {
-	return nil
+func (connection *Connection) get(request []protocol.Any) (response protocol.Any) {
+	return "cool"
 }
