@@ -33,7 +33,7 @@ func (server *Server) Listen() (error error) {
 	}
 }
 
-func (server *Server) handleConnection(connection net.Conn) {
-	connectionHandler := NewConnectionHandler(connection)
-	connectionHandler.handleConnection()
+func (server *Server) handleConnection(conn net.Conn) {
+	connection := NewConnection(conn)
+	connection.ServeRequests()
 }
