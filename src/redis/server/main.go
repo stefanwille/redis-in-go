@@ -34,16 +34,67 @@ func handleConnection(connection net.Conn) {
 	reader := bufio.NewReader(connection)
 	writer := bufio.NewWriter(connection)
 	for {
-		request, error := protocol.Unmarshal(reader)
+		request, eof, error := receiveRequest(reader, writer)
 		if error != nil {
-			log.Println(error)
-			if error.Error() == "EOF" {
-				return
-			}
+			continue
+		}
+		if eof {
+			return
 		}
 
-		log.Printf("request %v", request)
-		protocol.Marshal(writer, "OK")
-		writer.Flush()
+		response, error := handleRequest(request)
+		if error != nil {
+			return
+		}
+
+		error = sendResponse(writer, response)
+		if error != nil {
+			return
+		}
 	}
+}
+
+func receiveRequest(reader *bufio.Reader, writer *bufio.Writer) (request protocol.Any, eof bool, error error) {
+	request, error = protocol.Unmarshal(reader)
+	if error != nil {
+		log.Println(error)
+		if error.Error() == "EOF" {
+			return nil, true, nil
+		}
+
+		error := sendErrorResponse(writer, error)
+		return nil, false, error
+	}
+
+	return request, false, nil
+}
+
+func handleRequest(request protocol.Any) (response protocol.Any, error error) {
+	log.Printf("handleRequest %v", request)
+	return "OK", nil
+}
+
+func sendErrorResponse(writer *bufio.Writer, response error) (error error) {
+	error = sendResponse(writer, response)
+	if error != nil {
+		return error
+	}
+
+	return nil
+}
+
+func sendResponse(writer *bufio.Writer, response protocol.Any) (error error) {
+	error = protocol.Marshal(writer, response)
+	if error != nil {
+		log.Printf("Error while sending response: %v", error)
+		return error
+	}
+
+	error = writer.Flush()
+	if error != nil {
+		log.Printf("Error while flushing response: %v", error)
+		return error
+	}
+
+	return nil
 }
