@@ -8,6 +8,7 @@ import (
 	"redis/protocol"
 	"redis/server/database"
 	"redis/server/requesthandler"
+	"redis/server/requesthandlers"
 	"strings"
 )
 
@@ -84,7 +85,7 @@ func (connection *Connection) handleRequest(request protocol.Any) (response prot
 	connection.database.Lock()
 	defer connection.database.Unlock()
 
-	var requestContext requesthandler.RequestContext = connection
+	var requestContext requesthandlers.RequestContext = connection
 	return requestHandler(&requestContext, requestSlice)
 }
 
