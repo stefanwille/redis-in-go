@@ -1,68 +1,74 @@
 package protocol
 
 import (
-	"bytes"
+	"bufio"
 	"fmt"
 	"log"
 	"strconv"
 )
 
-func Unmarshal(buffer *bytes.Buffer) (result Any, error error) {
-	r, _, error := buffer.ReadRune()
+func Unmarshal(reader *bufio.Reader) (result Any, error error) {
+	r, _, error := reader.ReadRune()
 	if error != nil {
-		log.Fatal(error)
+		return
 	}
 	switch r {
 	case ':':
-		integerString, error := readLine(buffer)
+		integerString, error := readLine(reader)
 		if error != nil {
-			log.Fatal(error)
+			log.Print(error)
 			return nil, error
 		}
 		i, error := strconv.Atoi(integerString)
 		if error != nil {
-			log.Fatal(error)
+			log.Print(error)
 			return nil, error
 		}
 		return i, nil
 	case '$':
-		lengthString, error := readLine(buffer)
+		lengthString, error := readLine(reader)
 		if error != nil {
-			log.Fatal(error)
+			log.Print(error)
 			return nil, error
 		}
 		length, error := strconv.Atoi(lengthString)
 		if error != nil {
-			log.Fatal(error)
+			log.Print(error)
 			return nil, error
 		}
-		bytes := buffer.Next(length)
-		s := string(bytes)
-		_ = buffer.Next(2)
+		bytes, error := next(length, reader)
+		if error != nil {
+			log.Print(error)
+			return nil, error
+		}
+		_, error = next(2, reader)
+		if error != nil {
+			log.Print(error)
+			return nil, error
+		}
+		s := string(*bytes)
 		return s, nil
 	case '+':
-		s, error := readLine(buffer)
+		s, error := readLine(reader)
 		if error != nil {
-			log.Fatal(error)
+			log.Print(error)
 			return nil, error
 		}
 		return s, nil
 	case '*':
-		lengthString, error := readLine(buffer)
+		lengthString, error := readLine(reader)
 		if error != nil {
-			log.Fatal(error)
+			log.Print(error)
 			return nil, error
 		}
 		length, error := strconv.Atoi(lengthString)
 		if error != nil {
-			log.Fatal(error)
 			return nil, error
 		}
 		var array []Any
 		for i := 0; i < length; i++ {
-			element, error := Unmarshal(buffer)
+			element, error := Unmarshal(reader)
 			if error != nil {
-				log.Fatal(error)
 				return nil, error
 			}
 			array = append(array, element)
@@ -74,12 +80,25 @@ func Unmarshal(buffer *bytes.Buffer) (result Any, error error) {
 	}
 }
 
-func readLine(buffer *bytes.Buffer) (line string, error error) {
+// Reads the next n bytes
+func next(n int, reader *bufio.Reader) (bytes *[]byte, error error) {
+	buffer := make([]byte, n)
+	nread, error := reader.Read(buffer)
+	if error != nil {
+		return nil, error
+	}
+	if nread != n {
+		return nil, fmt.Errorf("next(%d) received only %d bytes", n, nread)
+	}
+	return &buffer, nil
+}
+
+func readLine(buffer *bufio.Reader) (line string, error error) {
 	line = ""
 	for {
 		c, _, error := buffer.ReadRune()
 		if error != nil {
-			log.Fatal(error)
+			log.Print(error)
 			return line, error
 		}
 
@@ -93,11 +112,11 @@ func readLine(buffer *bytes.Buffer) (line string, error error) {
 	// Read newline
 	c, _, error := buffer.ReadRune()
 	if error != nil {
-		log.Fatal(error)
+		log.Print(error)
 		return line, error
 	}
 	if c != '\n' {
-		log.Fatal("Expected newline")
+		log.Print("Expected newline")
 		return line, fmt.Errorf("Expected newline, got %s", string(c))
 	}
 	return line, nil

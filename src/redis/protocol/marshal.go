@@ -17,6 +17,11 @@ func Marshal(writer io.Writer, value Any) error {
 		fmt.Fprintf(writer, "$%d\r\n%s\r\n", len(stringValue), stringValue)
 		return nil
 
+	case error:
+		var errorValue error = value.(error)
+		fmt.Fprintf(writer, "-%s\r\n", errorValue.Error())
+		return nil
+
 	case *[]Any:
 		var arrayPointerValue *[]Any = value.(*[]Any)
 		fmt.Fprintf(writer, "*%d\r\n", len(*arrayPointerValue))

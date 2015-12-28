@@ -2,6 +2,7 @@ package protocol
 
 import (
 	"bytes"
+	"errors"
 	"testing"
 )
 
@@ -31,6 +32,21 @@ func TestMarshalEmptyString(t *testing.T) {
 	Marshal(&b, "")
 	var result string = b.String()
 	if result != "$0\r\n\r\n" {
+		t.Error(result)
+	}
+}
+
+func TestMarshalError(t *testing.T) {
+	var b bytes.Buffer
+
+	value := errors.New("Error message")
+	error := Marshal(&b, value)
+	if error != nil {
+		t.Errorf("Got error: %v", error)
+		return
+	}
+	var result string = b.String()
+	if result != "-Error message\r\n" {
 		t.Error(result)
 	}
 }

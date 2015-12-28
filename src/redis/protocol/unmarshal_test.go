@@ -1,14 +1,19 @@
 package protocol
 
 import (
+	"bufio"
 	"bytes"
 	"testing"
 )
 
+func UnmarshalString(s string) (result Any, error error) {
+	var buffer *bytes.Buffer = bytes.NewBufferString(s)
+	reader := bufio.NewReader(buffer)
+	return Unmarshal(reader)
+}
+
 func TestUnmarshalInt(t *testing.T) {
-	var buffer *bytes.Buffer = bytes.NewBufferString(":1000\r\n")
-	var result Any
-	result, error := Unmarshal(buffer)
+	result, error := UnmarshalString(":1000\r\n")
 	if error != nil {
 		t.Error(error)
 	}
@@ -18,9 +23,7 @@ func TestUnmarshalInt(t *testing.T) {
 }
 
 func TestUnmarshalString(t *testing.T) {
-	var buffer *bytes.Buffer = bytes.NewBufferString("$6\r\nfoobar\r\n")
-	var result Any
-	result, error := Unmarshal(buffer)
+	result, error := UnmarshalString("$6\r\nfoobar\r\n")
 	if error != nil {
 		t.Error(error)
 	}
@@ -30,9 +33,7 @@ func TestUnmarshalString(t *testing.T) {
 }
 
 func TestUnmarshalEmptyString(t *testing.T) {
-	var buffer *bytes.Buffer = bytes.NewBufferString("$0\r\n\r\n")
-	var result Any
-	result, error := Unmarshal(buffer)
+	result, error := UnmarshalString("$0\r\n\r\n")
 	if error != nil {
 		t.Error(error)
 	}
@@ -42,9 +43,7 @@ func TestUnmarshalEmptyString(t *testing.T) {
 }
 
 func TestUnmarshalSimpleString(t *testing.T) {
-	var buffer *bytes.Buffer = bytes.NewBufferString("+foobar\r\n")
-	var result Any
-	result, error := Unmarshal(buffer)
+	result, error := UnmarshalString("+foobar\r\n")
 	if error != nil {
 		t.Error(error)
 	}
@@ -54,9 +53,7 @@ func TestUnmarshalSimpleString(t *testing.T) {
 }
 
 func TestUnmarshalArray(t *testing.T) {
-	var buffer *bytes.Buffer = bytes.NewBufferString("*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n")
-	var result Any
-	result, error := Unmarshal(buffer)
+	result, error := UnmarshalString("*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n")
 	if error != nil {
 		t.Error(error)
 	}
@@ -67,9 +64,7 @@ func TestUnmarshalArray(t *testing.T) {
 }
 
 func TestUnmarshalEmptyArray(t *testing.T) {
-	var buffer *bytes.Buffer = bytes.NewBufferString("*0\r\n")
-	var result Any
-	result, error := Unmarshal(buffer)
+	result, error := UnmarshalString("*0\r\n")
 	if error != nil {
 		t.Error(error)
 	}
