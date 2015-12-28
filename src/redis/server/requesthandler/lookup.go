@@ -3,11 +3,13 @@ package requesthandler
 import (
 	"fmt"
 	"redis/server/requesthandlers/hash"
+	"redis/server/requesthandlers/keys"
 )
 
 var requestHandlers = map[string]RequestHandler{
-	"SET": hash.Set,
-	"GET": hash.Get,
+	"SET":  hash.Set,
+	"GET":  hash.Get,
+	"KEYS": keys.Keys,
 }
 
 func Lookup(command string) (RequestHandler, error) {
