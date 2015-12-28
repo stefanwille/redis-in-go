@@ -6,6 +6,8 @@ import (
 	"log"
 	"net"
 	"redis/protocol"
+	"redis/server/database"
+	"redis/server/requesthandler"
 	"strings"
 )
 
@@ -13,14 +15,18 @@ type Connection struct {
 	conn     net.Conn
 	reader   *bufio.Reader
 	writer   *bufio.Writer
-	database *Database
+	database *database.Database
 }
 
-func NewConnection(conn net.Conn, database *Database) *Connection {
+func NewConnection(conn net.Conn, database *database.Database) *Connection {
 	reader := bufio.NewReader(conn)
 	writer := bufio.NewWriter(conn)
 	connection := Connection{conn, reader, writer, database}
 	return &connection
+}
+
+func (connection *Connection) GetDatabase() *database.Database {
+	return connection.database
 }
 
 func (connection *Connection) ServeRequests() {
@@ -70,7 +76,7 @@ func (connection *Connection) handleRequest(request protocol.Any) (response prot
 		return fmt.Errorf("Expected command to be a string, got %T", command)
 	}
 	command = strings.ToUpper(command)
-	requestHandler, error := connection.LookupRequestHandler(command)
+	requestHandler, error := requesthandler.Lookup(command)
 	if error != nil {
 		return error
 	}
@@ -78,18 +84,8 @@ func (connection *Connection) handleRequest(request protocol.Any) (response prot
 	connection.database.Lock()
 	defer connection.database.Unlock()
 
-	return requestHandler(connection, requestSlice)
-}
-
-func (connection *Connection) LookupRequestHandler(command string) (RequestHandler, error) {
-	switch command {
-	case "SET":
-		return set, nil
-	case "GET":
-		return get, nil
-	default:
-		return nil, fmt.Errorf("Unknown command %s", command)
-	}
+	var requestContext requesthandler.RequestContext = connection
+	return requestHandler(&requestContext, requestSlice)
 }
 
 func (connection *Connection) sendErrorResponse(response error) (error error) {

@@ -3,15 +3,16 @@ package server
 import (
 	"log"
 	"net"
+	"redis/server/database"
 )
 
 type Server struct {
 	listenAddress string
-	database      *Database
+	database      *database.Database
 }
 
 func New(listenAddress string) *Server {
-	database := NewDatabase()
+	database := database.NewDatabase()
 	server := Server{listenAddress, database}
 	return &server
 }

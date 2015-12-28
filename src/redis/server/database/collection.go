@@ -1,3 +1,3 @@
-package server
+package database
 
 type Collection interface{}
