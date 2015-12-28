@@ -1,3 +1,4 @@
 package protocol
 
-type Any interface{}
+type Any interface {
+}

@@ -70,13 +70,25 @@ func (connection *Connection) handleRequest(request protocol.Any) (response prot
 		return fmt.Errorf("Expected command to be a string, got %T", command)
 	}
 	command = strings.ToUpper(command)
+	requestHandler, error := connection.LookupRequestHandler(command)
+	if error != nil {
+		return error
+	}
+
+	connection.database.Lock()
+	defer connection.database.Unlock()
+
+	return requestHandler(connection, requestSlice)
+}
+
+func (connection *Connection) LookupRequestHandler(command string) (RequestHandler, error) {
 	switch command {
 	case "SET":
-		return connection.set(requestSlice)
+		return set, nil
 	case "GET":
-		return connection.get(requestSlice)
+		return get, nil
 	default:
-		return fmt.Errorf("Unknown command %s", command)
+		return nil, fmt.Errorf("Unknown command %s", command)
 	}
 }
 
@@ -103,12 +115,4 @@ func (connection *Connection) sendResponse(response protocol.Any) (error error) 
 	}
 
 	return nil
-}
-
-func (connection *Connection) set(request []protocol.Any) (response protocol.Any) {
-	return "OK"
-}
-
-func (connection *Connection) get(request []protocol.Any) (response protocol.Any) {
-	return "cool"
 }
