@@ -6,88 +6,62 @@ import (
 	"testing"
 )
 
-func TestMarshalInt(t *testing.T) {
+func marshal(any Any) string {
 	var buffer bytes.Buffer
 
-	Marshal(&buffer, 1000)
-	var result string = buffer.String()
-	if result != ":1000\r\n" {
-		t.Error(result)
+	error := Marshal(&buffer, any)
+	if error != nil {
+		panic(error)
 	}
+	return buffer.String()
+}
+
+func testMarshal(any Any, expected string, t *testing.T) {
+	result := marshal(any)
+	if result != expected {
+		t.Errorf("Expected %s, got %s", expected, result)
+	}
+}
+
+func TestMarshalInt(t *testing.T) {
+	testMarshal(1000, ":1000\r\n", t)
 }
 
 func TestMarshalString(t *testing.T) {
-	var b bytes.Buffer
-
-	Marshal(&b, "foobar")
-	var result string = b.String()
-	if result != "$6\r\nfoobar\r\n" {
-		t.Error(result)
-	}
+	testMarshal("foobar", "$6\r\nfoobar\r\n", t)
 }
 
 func TestMarshalEmptyString(t *testing.T) {
-	var b bytes.Buffer
-
-	Marshal(&b, "")
-	var result string = b.String()
-	if result != "$0\r\n\r\n" {
-		t.Error(result)
-	}
+	testMarshal("", "$0\r\n\r\n", t)
 }
 
 func TestMarshalError(t *testing.T) {
-	var b bytes.Buffer
-
-	value := errors.New("Error message")
-	error := Marshal(&b, value)
-	if error != nil {
-		t.Errorf("Got error: %v", error)
-		return
-	}
-	var result string = b.String()
-	if result != "-Error message\r\n" {
-		t.Error(result)
-	}
+	testMarshal(errors.New("Error message"), "-Error message\r\n", t)
 }
 
 func TestMarshalNil(t *testing.T) {
-	var b bytes.Buffer
-
-	error := Marshal(&b, nil)
-	if error != nil {
-		t.Errorf("Got error: %v", error)
-		return
-	}
-	var result string = b.String()
-	if result != "$-1\r\n" {
-		t.Error(result)
-	}
+	testMarshal(nil, "$-1\r\n", t)
 }
 
 func TestMarshalArray(t *testing.T) {
-	var b bytes.Buffer
-
 	var a []Any = []Any{"foo", "bar"}
-
-	Marshal(&b, &a)
-	var result string = b.String()
-	expected := "*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n"
-	if result != expected {
-		t.Errorf("Expected %s, got %s", expected, result)
-	}
+	testMarshal(&a, "*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n", t)
 }
 
 func TestMarshalEmptyArray(t *testing.T) {
+	var a []Any = []Any{}
+	testMarshal(&a, "*0\r\n", t)
+}
+
+func TestMarshalUnsupportedTypeReturnsAnError(t *testing.T) {
 	var b bytes.Buffer
 
-	var a []Any = []Any{}
+	var m map[string]string
+	var a []Any = []Any{m}
 
-	Marshal(&b, &a)
-	var result string = b.String()
-	expected := "*0\r\n"
-	if result != expected {
-		t.Errorf("Expected %s, got %s", expected, result)
+	error := Marshal(&b, &a)
+	if error == nil {
+		t.Error("Expected error, got nil")
 	}
 }
 
@@ -99,16 +73,5 @@ func TestMarshalSimpleString(t *testing.T) {
 	expected := "+foobar\r\n"
 	if result != expected {
 		t.Errorf("Expected %s, got %s", expected, result)
-	}
-}
-func TestMarshalUnsupportedTypeReturnsAnError(t *testing.T) {
-	var b bytes.Buffer
-
-	var m map[string]string
-	var a []Any = []Any{m}
-
-	error := Marshal(&b, &a)
-	if error == nil {
-		t.Error("Expected error, got nil")
 	}
 }

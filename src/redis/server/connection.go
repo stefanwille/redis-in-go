@@ -67,7 +67,6 @@ func (connection *Connection) receiveRequest() (request protocol.Any, eof bool, 
 }
 
 func (connection *Connection) handleRequest(request protocol.Any) (response protocol.Any) {
-	log.Printf("handleRequest %v", request)
 	requestSlice, ok := request.([]protocol.Any)
 	if !ok {
 		return fmt.Errorf("Expected request to be an array, got %T", request)

@@ -7,8 +7,9 @@ import (
 )
 
 var requestHandlers = map[string]RequestHandler{
-	"SET":  hash.Set,
-	"GET":  hash.Get,
+	"HSET": hash.Set,
+	"HGET": hash.Get,
+	"SET":  keys.Set,
 	"KEYS": keys.Keys,
 }
 
