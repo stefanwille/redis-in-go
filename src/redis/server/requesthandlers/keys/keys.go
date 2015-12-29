@@ -8,10 +8,10 @@ import (
 )
 
 func Keys(requestContext requesthandlers.RequestContext, request []protocol.Any) (response protocol.Any) {
-	if len(request) < 2 {
+	if len(request) < 1 {
 		return fmt.Errorf("KEYS requires at least a PATTERN")
 	}
-	pattern, ok := request[1].(string)
+	pattern, ok := request[0].(string)
 	if !ok {
 		return fmt.Errorf("KEYS PATTERN must be a string")
 	}

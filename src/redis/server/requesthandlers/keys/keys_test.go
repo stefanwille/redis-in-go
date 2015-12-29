@@ -11,7 +11,7 @@ func TestKeys_ReturnsAllKeys(t *testing.T) {
 	requestContext := requesthandlers.NewTestRequestContext()
 	requestContext.GetDatabase().Collections["key"] = "value"
 
-	response := Keys(requestContext, []protocol.Any{"KEYS", "*"})
+	response := Keys(requestContext, []protocol.Any{"*"})
 	if !reflect.DeepEqual(response, []protocol.Any{"key"}) {
 		t.Errorf("Expected response ['key'], got %v", response)
 		return
@@ -22,7 +22,7 @@ func TestKeys_FiltersByGlob(t *testing.T) {
 	requestContext := requesthandlers.NewTestRequestContext()
 	requestContext.GetDatabase().Collections["key"] = "value"
 
-	response := Keys(requestContext, []protocol.Any{"KEYS", "m*"})
+	response := Keys(requestContext, []protocol.Any{"m*"})
 	sa, ok := response.([]protocol.Any)
 	if !ok {
 		t.Errorf("Expected response [], got %T ", response)

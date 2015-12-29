@@ -6,8 +6,6 @@ import (
 	"testing"
 )
 
-type Foo func(any *Any)()(bool)
-
 func assertMarshalEquals(any Any, expected string, t *testing.T) {
 	result := marshal(any)
 	if result != expected {

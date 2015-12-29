@@ -85,7 +85,7 @@ func (connection *Connection) handleRequest(request protocol.Any) (response prot
 	defer connection.database.Unlock()
 
 	var requestContext requesthandlers.RequestContext = connection
-	return requestHandler(requestContext, requestSlice)
+	return requestHandler(requestContext, requestSlice[1:])
 }
 
 func (connection *Connection) sendErrorResponse(response error) (error error) {

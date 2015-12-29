@@ -8,7 +8,7 @@ import (
 
 func TestSet(t *testing.T) {
 	requestContext := requesthandlers.NewTestRequestContext()
-	response := Set(requestContext, []protocol.Any{"SET", "foo", "bar"})
+	response := Set(requestContext, []protocol.Any{"foo", "bar"})
 	if response != "OK" {
 		t.Errorf("Expected response OK, got %v", response)
 		return

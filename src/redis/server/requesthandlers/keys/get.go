@@ -7,10 +7,10 @@ import (
 )
 
 func Get(requestContext requesthandlers.RequestContext, request []protocol.Any) (response protocol.Any) {
-	if len(request) < 2 {
+	if len(request) < 1 {
 		return fmt.Errorf("GET requires at least KEY")
 	}
-	key, ok := request[1].(string)
+	key, ok := request[0].(string)
 	if !ok {
 		return fmt.Errorf("GET KEY must be a string")
 	}
