@@ -7,7 +7,7 @@ import (
 	"redis/server/requesthandlers"
 )
 
-func Keys(requestContext *requesthandlers.RequestContext, request []protocol.Any) (response protocol.Any) {
+func Keys(requestContext requesthandlers.RequestContext, request []protocol.Any) (response protocol.Any) {
 	if len(request) < 2 {
 		return fmt.Errorf("KEYS requires at least a PATTERN")
 	}
@@ -17,7 +17,7 @@ func Keys(requestContext *requesthandlers.RequestContext, request []protocol.Any
 	}
 
 	var keys []protocol.Any
-	for key, _ := range (*requestContext).GetDatabase().Collections {
+	for key, _ := range requestContext.GetDatabase().Collections {
 		match, error := filepath.Match(pattern, key)
 		if error != nil {
 			return error

@@ -6,7 +6,7 @@ import (
 	"redis/server/requesthandlers"
 )
 
-func Set(requestContext *requesthandlers.RequestContext, request []protocol.Any) (response protocol.Any) {
+func Set(requestContext requesthandlers.RequestContext, request []protocol.Any) (response protocol.Any) {
 	if len(request) < 3 {
 		return fmt.Errorf("SET requires at least KEY and VALUE")
 	}
@@ -19,7 +19,7 @@ func Set(requestContext *requesthandlers.RequestContext, request []protocol.Any)
 		return fmt.Errorf("SET VALUE must be a string")
 	}
 
-	(*requestContext).GetDatabase().Collections[key] = value
+	requestContext.GetDatabase().Collections[key] = value
 
 	return "OK"
 }

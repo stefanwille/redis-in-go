@@ -6,7 +6,7 @@ import (
 	"redis/server/requesthandlers"
 )
 
-func Set(requestContext *requesthandlers.RequestContext, request []protocol.Any) (response protocol.Any) {
+func Hset(requestContext requesthandlers.RequestContext, request []protocol.Any) (response protocol.Any) {
 	if len(request) < 3 {
 		return fmt.Errorf("SET requires at least KEY and VALUE")
 	}
@@ -19,13 +19,13 @@ func Set(requestContext *requesthandlers.RequestContext, request []protocol.Any)
 		return fmt.Errorf("SET VALUE must be a string")
 	}
 
-	collection := (*requestContext).GetDatabase().Collections[key]
+	collection := requestContext.GetDatabase().Collections[key]
 	var hash *map[string]string
 	if collection == nil {
 		var newMap map[string]string
 		newMap = make(map[string]string)
 		hash = &newMap
-		(*requestContext).GetDatabase().Collections[key] = hash
+		requestContext.GetDatabase().Collections[key] = hash
 	} else {
 		hash, ok = collection.(*map[string]string)
 		if !ok {

@@ -6,7 +6,7 @@ import (
 	"redis/server/requesthandlers"
 )
 
-func Get(requestContext *requesthandlers.RequestContext, request []protocol.Any) (response protocol.Any) {
+func Hget(requestContext requesthandlers.RequestContext, request []protocol.Any) (response protocol.Any) {
 	if len(request) < 2 {
 		return fmt.Errorf("GET requires at least a KEY")
 	}
@@ -15,7 +15,7 @@ func Get(requestContext *requesthandlers.RequestContext, request []protocol.Any)
 		return fmt.Errorf("GET KEY must be a string")
 	}
 
-	collection := (*requestContext).GetDatabase().Collections[key]
+	collection := requestContext.GetDatabase().Collections[key]
 	if collection == nil {
 		return nil
 	}
