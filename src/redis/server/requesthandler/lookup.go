@@ -9,7 +9,9 @@ import (
 var requestHandlers = map[string]RequestHandler{
 	"HSET": hash.Hset,
 	"HGET": hash.Hget,
+	"GET":  keys.Get,
 	"SET":  keys.Set,
+	"DEL":  keys.Del,
 	"KEYS": keys.Keys,
 }
 

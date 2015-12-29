@@ -6,10 +6,10 @@ import (
 	"testing"
 )
 
-func TestDelete(t *testing.T) {
+func TestDel(t *testing.T) {
 	requestContext := requesthandlers.NewTestRequestContext()
 	requestContext.GetDatabase().Collections["key1"] = "value"
-	response := Delete(requestContext, []protocol.Any{"key1", "key2"})
+	response := Del(requestContext, []protocol.Any{"key1", "key2"})
 	if response != 1 {
 		t.Errorf("Expected response 1, got %v", response)
 		return

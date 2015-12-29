@@ -6,7 +6,7 @@ import (
 	"redis/server/requesthandlers"
 )
 
-func Delete(requestContext requesthandlers.RequestContext, request []protocol.Any) (response protocol.Any) {
+func Del(requestContext requesthandlers.RequestContext, request []protocol.Any) (response protocol.Any) {
 	if len(request) < 1 {
 		return fmt.Errorf("DEL requires at least one KEY")
 	}
