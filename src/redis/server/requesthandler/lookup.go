@@ -7,8 +7,8 @@ import (
 )
 
 var requestHandlers = map[string]RequestHandler{
-	"HSET": hash.Hset,
-	"HGET": hash.Hget,
+	// "HSET": hash.Hset,
+	// "HGET": hash.Hget,
 	"GET":  keys.Get,
 	"SET":  keys.Set,
 	"DEL":  keys.Del,
@@ -16,7 +16,6 @@ var requestHandlers = map[string]RequestHandler{
 }
 
 func Lookup(command string) (RequestHandler, error) {
-
 	requestHandler := requestHandlers[command]
 	if requestHandler == nil {
 		return nil, fmt.Errorf("Unknown command %s", command)
