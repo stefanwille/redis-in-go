@@ -15,7 +15,7 @@ func Save(requestContext requesthandlers.RequestContext, request []protocol.Any)
 
 	// collections := requestContext.GetDatabase().Collections
 
-	sqlite, error := sqlite3.Open("sqlite.db")
+	sqlite, error := sqlite3.Open("/tmp/sqlite.db")
 	if error != nil {
 		log.Print(error)
 		return error
@@ -23,7 +23,6 @@ func Save(requestContext requesthandlers.RequestContext, request []protocol.Any)
 	defer sqlite.Close()
 
 	sqlite.Exec("CREATE TABLE x(a, b, c)")
-	sqlite.Commit()
 
 	return "OK"
 }
