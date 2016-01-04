@@ -8,7 +8,6 @@ import (
 	"redis/protocol"
 	"redis/server/database"
 	"redis/server/requesthandler"
-	"redis/server/requesthandlers"
 	"strings"
 )
 
@@ -75,6 +74,7 @@ func (connection *Connection) handleRequest(request protocol.Any) (response prot
 	if !ok {
 		return fmt.Errorf("Expected command to be a string, got %T", command)
 	}
+	log.Printf("Request: %v", requestSlice)
 	command = strings.ToUpper(command)
 	requestHandler, isWriter, error := requesthandler.Lookup(command)
 	if error != nil {
@@ -90,8 +90,7 @@ func (connection *Connection) handleRequest(request protocol.Any) (response prot
 
 	}
 
-	var requestContext requesthandlers.RequestContext = connection
-	return requestHandler(requestContext, requestSlice[1:])
+	return requestHandler(connection, requestSlice[1:])
 }
 
 func (connection *Connection) sendErrorResponse(response error) (error error) {

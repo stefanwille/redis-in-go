@@ -6,11 +6,11 @@ import (
 	"redis/server/requesthandlers"
 )
 
-func Hget(requestContext requesthandlers.RequestContext, request []protocol.Any) (response protocol.Any) {
-	if len(request) < 2 {
+func Hget(requestContext requesthandlers.RequestContext, parameters []protocol.Any) (response protocol.Any) {
+	if len(parameters) < 2 {
 		return fmt.Errorf("GET requires at least a KEY")
 	}
-	key, ok := request[1].(string)
+	key, ok := parameters[1].(string)
 	if !ok {
 		return fmt.Errorf("GET KEY must be a string")
 	}

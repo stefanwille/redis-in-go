@@ -7,11 +7,11 @@ import (
 	"redis/server/requesthandlers"
 )
 
-func Keys(requestContext requesthandlers.RequestContext, request []protocol.Any) (response protocol.Any) {
-	if len(request) < 1 {
+func Keys(requestContext requesthandlers.RequestContext, parameters []protocol.Any) (response protocol.Any) {
+	if len(parameters) < 1 {
 		return fmt.Errorf("KEYS requires at least a PATTERN")
 	}
-	pattern, ok := request[0].(string)
+	pattern, ok := parameters[0].(string)
 	if !ok {
 		return fmt.Errorf("KEYS PATTERN must be a string")
 	}

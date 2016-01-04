@@ -2,8 +2,8 @@ package requesthandler
 
 import (
 	"fmt"
-	// "redis/server/requesthandlers/hash"
 	"redis/server/requesthandlers/keys"
+	"redis/server/requesthandlers/persistence"
 )
 
 type RequestHandlerDefinition struct {
@@ -12,20 +12,19 @@ type RequestHandlerDefinition struct {
 	isWriter       bool
 }
 
-var requestHandlerDefinitions = []RequestHandlerDefinition{
-	// "HSET": hash.Hset,
-	// "HGET": hash.Hget,
+var requestHandlerDefinitions = []*RequestHandlerDefinition{
 	{command: "GET", requestHandler: keys.Get, isWriter: false},
 	{command: "SET", requestHandler: keys.Set, isWriter: true},
 	{command: "DEL", requestHandler: keys.Del, isWriter: true},
 	{command: "KEYS", requestHandler: keys.Keys, isWriter: false},
+	{command: "SAVE", requestHandler: persistence.Save, isWriter: false},
 }
 
 var commandToRequestHandlerDefinition = map[string]*RequestHandlerDefinition{}
 
 func init() {
 	for _, requestHandlerDefinition := range requestHandlerDefinitions {
-		commandToRequestHandlerDefinition[requestHandlerDefinition.command] = &requestHandlerDefinition
+		commandToRequestHandlerDefinition[requestHandlerDefinition.command] = requestHandlerDefinition
 	}
 }
 

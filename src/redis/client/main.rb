@@ -8,5 +8,6 @@ redis = Redis.new
 puts redis.set("mykey", "hello world")
 puts redis.get("mykey")
 puts "keys:", redis.keys("*")
-puts redis.del("mykey")
-puts "keys:", redis.keys("*")
+# puts redis.del("mykey")
+# puts "keys:", redis.keys("*")
+redis.save

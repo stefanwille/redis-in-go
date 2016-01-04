@@ -17,7 +17,11 @@ func New(listenAddress string) *Server {
 	return &server
 }
 
-func (server *Server) Listen() (error error) {
+func (server *Server) Load(filename string) error {
+	return server.database.Load(filename)
+}
+
+func (server *Server) Listen() error {
 	log.Printf("Launching server on address %s", server.listenAddress)
 	listener, error := net.Listen("tcp", server.listenAddress)
 	if error != nil {

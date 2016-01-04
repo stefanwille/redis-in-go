@@ -6,15 +6,15 @@ import (
 	"redis/server/requesthandlers"
 )
 
-func Hset(requestContext requesthandlers.RequestContext, request []protocol.Any) (response protocol.Any) {
-	if len(request) < 3 {
+func Hset(requestContext requesthandlers.RequestContext, parameters []protocol.Any) (response protocol.Any) {
+	if len(parameters) < 3 {
 		return fmt.Errorf("SET requires at least KEY and VALUE")
 	}
-	key, ok := request[1].(string)
+	key, ok := parameters[1].(string)
 	if !ok {
 		return fmt.Errorf("SET KEY must be a string")
 	}
-	value, ok := request[2].(string)
+	value, ok := parameters[2].(string)
 	if !ok {
 		return fmt.Errorf("SET VALUE must be a string")
 	}

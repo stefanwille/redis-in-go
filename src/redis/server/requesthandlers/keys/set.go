@@ -6,15 +6,15 @@ import (
 	"redis/server/requesthandlers"
 )
 
-func Set(requestContext requesthandlers.RequestContext, request []protocol.Any) (response protocol.Any) {
-	if len(request) < 2 {
+func Set(requestContext requesthandlers.RequestContext, parameters []protocol.Any) (response protocol.Any) {
+	if len(parameters) < 2 {
 		return fmt.Errorf("SET requires at least KEY and VALUE")
 	}
-	key, ok := request[0].(string)
+	key, ok := parameters[0].(string)
 	if !ok {
 		return fmt.Errorf("SET KEY must be a string")
 	}
-	value, ok := request[1].(string)
+	value, ok := parameters[1].(string)
 	if !ok {
 		return fmt.Errorf("SET VALUE must be a string")
 	}
