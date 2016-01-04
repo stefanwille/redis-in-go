@@ -76,13 +76,19 @@ func (connection *Connection) handleRequest(request protocol.Any) (response prot
 		return fmt.Errorf("Expected command to be a string, got %T", command)
 	}
 	command = strings.ToUpper(command)
-	requestHandler, error := requesthandler.Lookup(command)
+	requestHandler, isWriter, error := requesthandler.Lookup(command)
 	if error != nil {
 		return error
 	}
 
-	connection.database.Lock()
-	defer connection.database.Unlock()
+	if isWriter {
+		connection.database.Lock()
+		defer connection.database.Unlock()
+	} else {
+		connection.database.RLock()
+		defer connection.database.RUnlock()
+
+	}
 
 	var requestContext requesthandlers.RequestContext = connection
 	return requestHandler(requestContext, requestSlice[1:])

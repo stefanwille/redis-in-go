@@ -2,24 +2,38 @@ package requesthandler
 
 import (
 	"fmt"
-	"redis/server/requesthandlers/hash"
+	// "redis/server/requesthandlers/hash"
 	"redis/server/requesthandlers/keys"
 )
 
-var requestHandlers = map[string]RequestHandler{
-	// "HSET": hash.Hset,
-	// "HGET": hash.Hget,
-	"GET":  keys.Get,
-	"SET":  keys.Set,
-	"DEL":  keys.Del,
-	"KEYS": keys.Keys,
+type RequestHandlerDefinition struct {
+	command        string
+	requestHandler RequestHandler
+	isWriter       bool
 }
 
-func Lookup(command string) (RequestHandler, error) {
-	requestHandler := requestHandlers[command]
-	if requestHandler == nil {
-		return nil, fmt.Errorf("Unknown command %s", command)
+var requestHandlerDefinitions = []RequestHandlerDefinition{
+	// "HSET": hash.Hset,
+	// "HGET": hash.Hget,
+	{command: "GET", requestHandler: keys.Get, isWriter: false},
+	{command: "SET", requestHandler: keys.Set, isWriter: true},
+	{command: "DEL", requestHandler: keys.Del, isWriter: true},
+	{command: "KEYS", requestHandler: keys.Keys, isWriter: false},
+}
+
+var commandToRequestHandlerDefinition = map[string]*RequestHandlerDefinition{}
+
+func init() {
+	for _, requestHandlerDefinition := range requestHandlerDefinitions {
+		commandToRequestHandlerDefinition[requestHandlerDefinition.command] = &requestHandlerDefinition
+	}
+}
+
+func Lookup(command string) (RequestHandler, bool, error) {
+	var requestHandlerDefinition *RequestHandlerDefinition = commandToRequestHandlerDefinition[command]
+	if requestHandlerDefinition == nil {
+		return nil, true, fmt.Errorf("Unknown command %s", command)
 	}
 
-	return requestHandler, nil
+	return requestHandlerDefinition.requestHandler, requestHandlerDefinition.isWriter, nil
 }

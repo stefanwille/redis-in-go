@@ -4,7 +4,7 @@ import "sync"
 
 type Database struct {
 	Collections map[string]Collection
-	sync.Mutex
+	sync.RWMutex
 }
 
 func NewDatabase() *Database {
