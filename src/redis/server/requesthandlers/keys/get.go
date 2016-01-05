@@ -2,7 +2,7 @@ package keys
 
 import (
 	"fmt"
-	"redis/protocol"
+	"redis/server/protocol"
 	"redis/server/requesthandlers"
 )
 

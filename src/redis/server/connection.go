@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"redis/protocol"
 	"redis/server/database"
+	"redis/server/protocol"
 	"redis/server/requesthandler"
 	"strings"
 )

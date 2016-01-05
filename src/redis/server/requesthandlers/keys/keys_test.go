@@ -1,7 +1,7 @@
 package keys
 
 import (
-	"redis/protocol"
+	"redis/server/protocol"
 	"redis/server/requesthandlers"
 	"reflect"
 	"testing"
