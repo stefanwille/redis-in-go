@@ -6,13 +6,13 @@ import "log"
 import "encoding/json"
 
 type Database struct {
-	Objects      map[string]Collection `json:"Objects"`
+	Objects      map[string]RedisObject `json:"Objects"`
 	sync.RWMutex `json:"-"`
 }
 
 func NewDatabase() *Database {
 	var database Database
-	database.Objects = make(map[string]Collection)
+	database.Objects = make(map[string]RedisObject)
 	return &database
 }
 
