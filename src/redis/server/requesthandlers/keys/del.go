@@ -16,9 +16,9 @@ func Del(requestContext requesthandlers.RequestContext, parameters []protocol.An
 		if !ok {
 			return fmt.Errorf("DEL KEY must be a string")
 		}
-		_, found := requestContext.GetDatabase().Collections[keyString]
+		_, found := requestContext.GetDatabase().Objects[keyString]
 		if found {
-			delete(requestContext.GetDatabase().Collections, keyString)
+			delete(requestContext.GetDatabase().Objects, keyString)
 			deleteCount++
 		}
 	}

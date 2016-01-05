@@ -15,7 +15,7 @@ func Hget(requestContext requesthandlers.RequestContext, parameters []protocol.A
 		return fmt.Errorf("GET KEY must be a string")
 	}
 
-	collection := requestContext.GetDatabase().Collections[key]
+	collection := requestContext.GetDatabase().Objects[key]
 	if collection == nil {
 		return nil
 	}

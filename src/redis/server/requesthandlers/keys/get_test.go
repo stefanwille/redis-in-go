@@ -8,7 +8,7 @@ import (
 
 func TestGet_ReturnsStringValue(t *testing.T) {
 	requestContext := requesthandlers.NewTestRequestContext()
-	requestContext.GetDatabase().Collections["key"] = "value"
+	requestContext.GetDatabase().Objects["key"] = "value"
 
 	response := Get(requestContext, []protocol.Any{"key"})
 	if response != "value" {
@@ -19,7 +19,7 @@ func TestGet_ReturnsStringValue(t *testing.T) {
 
 func TestGet_ReturnsNil(t *testing.T) {
 	requestContext := requesthandlers.NewTestRequestContext()
-	requestContext.GetDatabase().Collections["key"] = nil
+	requestContext.GetDatabase().Objects["key"] = nil
 
 	response := Get(requestContext, []protocol.Any{"key"})
 	if response != nil {

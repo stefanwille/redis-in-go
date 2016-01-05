@@ -19,7 +19,7 @@ func Set(requestContext requesthandlers.RequestContext, parameters []protocol.An
 		return fmt.Errorf("SET VALUE must be a string")
 	}
 
-	requestContext.GetDatabase().Collections[key] = value
+	requestContext.GetDatabase().Objects[key] = value
 
 	return "OK"
 }

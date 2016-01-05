@@ -15,7 +15,7 @@ func Get(requestContext requesthandlers.RequestContext, parameters []protocol.An
 		return fmt.Errorf("GET KEY must be a string")
 	}
 
-	value := requestContext.GetDatabase().Collections[key]
+	value := requestContext.GetDatabase().Objects[key]
 
 	if value == nil {
 		return value

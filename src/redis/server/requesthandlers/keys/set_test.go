@@ -13,7 +13,7 @@ func TestSet(t *testing.T) {
 		t.Errorf("Expected response OK, got %v", response)
 		return
 	}
-	key := requestContext.GetDatabase().Collections["key"]
+	key := requestContext.GetDatabase().Objects["key"]
 	if key != "value" {
 		t.Errorf("Expected value key to equal 'value', got %v", key)
 	}

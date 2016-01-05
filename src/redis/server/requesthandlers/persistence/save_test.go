@@ -8,7 +8,7 @@ import (
 
 func TestSave_WritesAFile(t *testing.T) {
 	requestContext := requesthandlers.NewTestRequestContext()
-	requestContext.GetDatabase().Collections["key"] = "value"
+	requestContext.GetDatabase().Objects["key"] = "value"
 
 	response := Save(requestContext, []protocol.Any{})
 	if response != "OK" {

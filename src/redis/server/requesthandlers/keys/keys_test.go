@@ -9,7 +9,7 @@ import (
 
 func TestKeys_ReturnsAllKeys(t *testing.T) {
 	requestContext := requesthandlers.NewTestRequestContext()
-	requestContext.GetDatabase().Collections["key"] = "value"
+	requestContext.GetDatabase().Objects["key"] = "value"
 
 	response := Keys(requestContext, []protocol.Any{"*"})
 	if !reflect.DeepEqual(response, []protocol.Any{"key"}) {
@@ -20,7 +20,7 @@ func TestKeys_ReturnsAllKeys(t *testing.T) {
 
 func TestKeys_FiltersByGlob(t *testing.T) {
 	requestContext := requesthandlers.NewTestRequestContext()
-	requestContext.GetDatabase().Collections["key"] = "value"
+	requestContext.GetDatabase().Objects["key"] = "value"
 
 	response := Keys(requestContext, []protocol.Any{"m*"})
 	sa, ok := response.([]protocol.Any)

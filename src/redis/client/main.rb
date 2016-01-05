@@ -11,3 +11,4 @@ puts "keys:", redis.keys("*")
 # puts redis.del("mykey")
 # puts "keys:", redis.keys("*")
 redis.save
+puts redis.dbsize

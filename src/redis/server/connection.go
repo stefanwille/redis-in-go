@@ -8,6 +8,7 @@ import (
 	"redis/server/database"
 	"redis/server/protocol"
 	"redis/server/requesthandler"
+	"runtime/debug"
 	"strings"
 )
 
@@ -31,6 +32,13 @@ func (connection *Connection) GetDatabase() *database.Database {
 
 func (connection *Connection) ServeRequests() {
 	log.Printf("New connection from %v\n", connection.conn.RemoteAddr())
+	defer func() {
+		if r := recover(); r != nil {
+
+			log.Printf("*** Panic ***: %v, %s", r, debug.Stack())
+			return
+		}
+	}()
 	defer connection.conn.Close()
 	for {
 		request, eof, error := connection.receiveRequest()

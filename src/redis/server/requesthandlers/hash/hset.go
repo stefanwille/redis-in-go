@@ -19,13 +19,13 @@ func Hset(requestContext requesthandlers.RequestContext, parameters []protocol.A
 		return fmt.Errorf("SET VALUE must be a string")
 	}
 
-	collection := requestContext.GetDatabase().Collections[key]
+	collection := requestContext.GetDatabase().Objects[key]
 	var hash *map[string]string
 	if collection == nil {
 		var newMap map[string]string
 		newMap = make(map[string]string)
 		hash = &newMap
-		requestContext.GetDatabase().Collections[key] = hash
+		requestContext.GetDatabase().Objects[key] = hash
 	} else {
 		hash, ok = collection.(*map[string]string)
 		if !ok {

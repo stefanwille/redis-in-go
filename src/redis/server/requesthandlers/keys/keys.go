@@ -17,7 +17,7 @@ func Keys(requestContext requesthandlers.RequestContext, parameters []protocol.A
 	}
 
 	var keys []protocol.Any
-	for key, _ := range requestContext.GetDatabase().Collections {
+	for key, _ := range requestContext.GetDatabase().Objects {
 		match, error := filepath.Match(pattern, key)
 		if error != nil {
 			return error
